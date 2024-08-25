@@ -18,6 +18,3 @@ This mini project is designed to design a real-time QR for a specific informatio
 3. Enter the desired location in the provided input field.
 4. Click the "Generate QR Code" button to fetch and display the QR code information for the specified input.
 
-
-https://www.canva.com/design/DAGCUj6ajRQ/cG24Bw85dv9Gz3jxEOKI_A/view?utm_content=DAGCUj6ajRQ&utm_campaign=designshare&utm_medium=link&utm_source=editor#1
-
