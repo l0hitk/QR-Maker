@@ -3,37 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Maker</title>
+    <title>QR Code Generator</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <p>Enter your Text or Link here</p>
-        <input type="text" placeholder="Text or Url" id="qrText">
-        <div class="imgBox">
-            <img src="" id="qrImage">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-qrcode"></i> QR Code Studio</h1>
         </div>
-        <button onclick="genqr()">Generate QR Code</button>
+
+        <!-- Main Content Grid -->
+        <div class="main-grid">
+            <!-- Left Panel: Input & Controls -->
+            <div class="left-panel">
+                <!-- Input Section -->
+                <div class="card input-section">
+                    <h3><i class="fas fa-edit"></i> QR Code Content</h3>
+                    <textarea id="qrText" placeholder="Enter URL, text, or message..."></textarea>
+
+               
+     <!-- Quick Actions -->
+                    <div class="quick-actions">
+                        <button class="quick-btn" onclick="setContent('url')">
+                            <i class="fas fa-link"></i> URL
+                        </button>
+                        <button class="quick-btn" onclick="setContent('email')">
+                            <i class="fas fa-envelope"></i> Email
+                        </button>
+                        <button class="quick-btn" onclick="setContent('phone')">
+                            <i class="fas fa-phone"></i> Phone
+                        </button>
+                        <button class="quick-btn" onclick="setContent('text')">
+                            <i class="fas fa-align-left"></i> Text
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Customization Section -->
+                <div class="card customize-section">
+                    <h3><i class="fas fa-palette"></i> Customize</h3>
+                    <div class="options">
+                        <div class="option-group">
+                            <label>QR Size</label>
+                            <select id="qrSize">
+                                <option value="200">Small (200x200)</option>
+                                <option value="300" selected>Medium (300x300)</option>
+                                <option value="500">Large (500x500)</option>
+                                <option value="800">Extra Large (800x800)</option>
+                            </select>
+                        </div>
+                        <div class="option-group">
+                            <label>QR Color</label>
+                            <input type="color" id="qrColor" value="#000000">
+                        </div>
+                    </div>
+
+                    <button class="generate-btn" onclick="generateQR()">
+                        <i class="fas fa-magic"></i> Generate QR Code
+                    </button>
+                </div>
+
+                <!-- Social Media Templates -->
+                <div class="card template-section">
+                    <h3><i class="fas fa-images"></i> Social Media Templates</h3>
+                    <div class="template-grid">
+                        <div class="template-item" onclick="applyTemplate('instagram-post')">
+                            <div class="template-preview instagram-post-preview">
+                                <i class="fab fa-instagram"></i>
+                            </div>
+                            <span>Instagram Post</span>
+                            <small>1080x1080</small>
+                        </div>
+                        <div class="template-item" onclick="applyTemplate('instagram-story')">
+                            <div class="template-preview instagram-story-preview">
+                                <i class="fab fa-instagram"></i>
+                            </div>
+                            <span>Instagram Story</span>
+                            <small>1080x1920</small>
+                        </div>
+                        <div class="template-item" onclick="applyTemplate('facebook')">
+                            <div class="template-preview facebook-preview">
+                                <i class="fab fa-facebook"></i>
+                            </div>
+                            <span>Facebook</span>
+                            <small>1200x630</small>
+                        </div>
+                        <div class="template-item" onclick="applyTemplate('twitter')">
+                            <div class="template-preview twitter-preview">
+                                <i class="fab fa-twitter"></i>
+                            </div>
+                            <span>Twitter/X</span>
+                            <small>1200x675</small>
+                        </div>
+                        <div class="template-item" onclick="applyTemplate('linkedin')">
+                            <div class="template-preview linkedin-preview">
+                                <i class="fab fa-linkedin"></i>
+                            </div>
+                            <span>LinkedIn</span>
+                            <small>1200x627</small>
+                        </div>
+                        <div class="template-item" onclick="applyTemplate('business-card')">
+                            <div class="template-preview business-card-preview">
+                                <i class="fas fa-id-card"></i>
+                            </div>
+                            <span>Business Card</span>
+                            <small>850x550</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Preview & Download -->
+            <div class="right-panel">
+                <div class="card preview-section">
+                    <h3>
+                        <i class="fas fa-eye"></i> Preview
+                        <span id="dimensionBadge" class="size-badge" style="display: none;">
+                            <i class="fas fa-expand"></i>
+                            <span id="dimensionText"></span>
+                        </span>
+                    </h3>
+
+                    <!-- Enhanced Canvas Container -->
+                    <div id="canvasContainer" class="canvas-container">
+                        <!-- Canvas Wrapper -->
+                        <div class="canvas-wrapper">
+                            <canvas id="templateCanvas"></canvas>
+                            <div id="placeholderText" class="placeholder-text">
+                                <i class="fas fa-qrcode"></i>
+                                <p>Your QR code will appear here</p>
+                                <small>Generate a code to get started</small>
+                            </div>
+                        </div>
+
+                        <!-- Loading Spinner -->
+                        <div id="loadingSpinner" class="loading-spinner"></div>
+
+                        <!-- Canvas Controls Overlay -->
+                        <div class="canvas-controls">
+                            <button class="canvas-control-btn" onclick="zoomIn()" title="Zoom In">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                            <button class="canvas-control-btn" onclick="zoomOut()" title="Zoom Out">
+                                <i class="fas fa-search-minus"></i>
+                            </button>
+                            <button class="canvas-control-btn" onclick="resetZoom()" title="Reset View">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                            <button class="canvas-control-btn" onclick="fullscreen()" title="Fullscreen">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                        </div>
+
+                        <!-- Info Badge -->
+                        <div class="canvas-info">
+                            <i class="fas fa-info-circle"></i>
+                            <span id="canvasInfoText">Ready to download</span>
+                        </div>
+                    </div>
+
+                    <!-- Enhanced Template Controls -->
+                    <div id="templateControls" class="template-controls" style="display: none;">
+                        <h4><i class="fas fa-sliders-h"></i> Template Settings</h4>
+
+                        <div class="control-group">
+                            <label><i class="fas fa-heading"></i> Headline Text</label>
+                            <input type="text" id="headlineText" placeholder="e.g., Scan Me!" oninput="updateCanvas()">
+                        </div>
+
+                        <div class="control-group">
+                            <label><i class="fas fa-align-center"></i> Subtext</label>
+                            <input type="text" id="subtextInput" placeholder="e.g., Point your camera here" oninput="updateCanvas()">
+                        </div>
+
+                        <div class="control-group">
+                            <label><i class="fas fa-fill-drip"></i> Background Color</label>
+                            <div class="color-picker-wrapper">
+                                <input type="color" id="bgColor" value="#667eea" oninput="updateCanvas()">
+                                <div class="color-presets">
+                                    <div class="color-preset" style="background: #667eea;" onclick="setColor('#667eea')"></div>
+                                    <div class="color-preset" style="background: #f093fb;" onclick="setColor('#f093fb')"></div>
+                                    <div class="color-preset" style="background: #4facfe;" onclick="setColor('#4facfe')"></div>
+                                    <div class="color-preset" style="background: #43e97b;" onclick="setColor('#43e97b')"></div>
+                                    <div class="color-preset" style="background: #fa709a;" onclick="setColor('#fa709a')"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Enhanced Action Buttons -->
+                    <div id="actionButtons" class="action-buttons" style="display: none;">
+                        <div class="download-options">
+                            <label><i class="fas fa-file-download"></i> Download Format</label>
+                            <select id="downloadFormat">
+                                <option value="png">PNG - Best Quality (Recommended)</option>
+                                <option value="jpeg">JPEG - Smaller File Size</option>
+                                <option value="svg">SVG - Vector Format</option>
+                                <option value="webp">WebP - Modern Format</option>
+                            </select>
+                        </div>
+
+                        <div class="button-row">
+                            <button class="action-btn download-btn" onclick="downloadQR()">
+                                <i class="fas fa-download"></i>
+                                <span>Download</span>
+                            </button>
+                            <button class="action-btn copy-btn" onclick="copyToClipboard()">
+                                <i class="fas fa-copy"></i>
+                                <span>Copy</span>
+                            </button>
+                            <button class="action-btn share-btn" onclick="shareQR()">
+                                <i class="fas fa-share-alt"></i>
+                                <span>Share</span>
+                            </button>
+                        </div>
+
+                        <button class="clear-btn" onclick="clearAll()">
+                            <i class="fas fa-trash-alt"></i> Clear & Start Over
+                        </button>
+                    </div>
+                </div>
+
+                <!-- History Section -->
+                <div class="card history-section">
+                    <h3><i class="fas fa-history"></i> Recent QR Codes</h3>
+                    <div id="historyList" class="history-list">
+                        <p class="empty-history">No history yet. Generate your first QR code!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <script>
-        let imgBox=document.getElementById("imgBox");
-        let qrText=document.getElementById("qrText");
-        let qrImage=document.getElementById("qrImage");
 
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
 
-        function genqr(){
-            if(qrText.value>""){
-            qrImage.src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data="+qrText.value;
-         
-                  img.classlist.add("show-img")
-        }else{
-            qrText.classList.add("error");
-            setTimeout(()=>{
-
-                qrText.classList.remove("error");
-              },1000);
-        }
-    }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
